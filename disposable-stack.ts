@@ -37,10 +37,7 @@ import type { Disposable } from "./disposable.ts";
 export class DisposableStack {
   #disposed = false;
   #errors: unknown[] = [];
-  #stack: [
-    Disposable | AsyncDisposable | undefined,
-    ((value?: unknown) => void | Promise<void>) | undefined,
-  ][] = [];
+  #stack: [Disposable | undefined, ((v?: unknown) => void) | undefined][] = [];
 
   /** Returns a value indicating whether this stack has been disposed. */
   get disposed(): boolean {
@@ -54,21 +51,17 @@ export class DisposableStack {
       while (this.#stack.length > 0) {
         const [value, onDispose] = this.#stack.pop()!;
         try {
-          if (typeof onDispose === "function") onDispose(value);
-          if (
+          if (typeof onDispose === "function") {
+            onDispose(value);
+          } else if (
             value && typeof value === "object" ||
             typeof value === "function"
           ) {
             if (
               Symbol.dispose in value &&
-              typeof value?.[Symbol.dispose] === "function"
+              typeof value[Symbol.dispose] === "function"
             ) {
               value[Symbol.dispose]();
-            } else if (
-              Symbol.asyncDispose in value &&
-              typeof value?.[Symbol.asyncDispose] === "function"
-            ) {
-              value[Symbol.asyncDispose]();
             }
           }
         } catch (error) {
@@ -84,13 +77,13 @@ export class DisposableStack {
    * @param value The resource to add. `null` and `undefined` will not be added, but **_will_** be returned.
    * @returns The provided {@link value}.
    */
-  use<T extends Disposable | AsyncDisposable | null | undefined>(value: T): T {
+  use<T extends Disposable | null | undefined>(value: T): T {
     if (this.disposed) throw new ReferenceError("Object has been disposed.");
     if (value != null) this.#stack.push([value, undefined]);
     return value;
   }
 
-  /**
+  /*
    * Adds a value and associated disposal callback as a resource to the stack.
    * @param value The value to add.
    * @param onDispose The callback to use in place of a `[Symbol.dispose]()` method. Will be invoked with `value` as the first parameter.
@@ -102,9 +95,7 @@ export class DisposableStack {
     return value;
   }
 
-  /**
-   * Adds a callback to be invoked when the stack is disposed.
-   */
+  /** Adds a callback to be invoked when the stack is disposed. */
   defer(onDispose: () => void): void {
     if (this.disposed) throw new ReferenceError("Object has been disposed.");
     this.#stack.push([undefined, onDispose]);
@@ -121,17 +112,18 @@ export class DisposableStack {
    *   #res2: Disposable;
    *   #disposables: DisposableStack;
    *   constructor() {
-   *     // stack will be disposed when exiting constructor for any reason
+   *     // stack will be disposed of when exiting constructor for any reason.
    *     using stack = new DisposableStack();
    *
    *     // get first resource
    *     this.#res1 = stack.use(getResource1());
    *
-   *     // get second resource. If this fails, both `stack` and `#res1` will be disposed.
+   *     // get second resource.
+   *     // If this fails, both `stack` and `#res1` will be disposed.
    *     this.#res2 = stack.use(getResource2());
    *
-   *     // all operations succeeded, move resources out of `stack` so that they aren't disposed
-   *     // when constructor exits
+   *     // all operations succeeded! move resources out of `stack` so that
+   *     // they aren't disposed when constructor exits.
    *     this.#disposables = stack.move();
    *   }
    *
