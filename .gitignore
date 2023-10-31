@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+*.lock
+*-lock.*
+node_modules
+.deno
+.cache
+.npm
