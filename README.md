@@ -1,8 +1,11 @@
-# dispose: a polyfill for `DisposableStack` and `AsyncDisposableStack`
+# dispose
 
-Bare-bones implementation of the `DisposableStack` and `AsyncDisposableStack`
-interfaces from the **[Explicit Resource Management Proposal]**. It is based on
-the [TypeScript v5.2.2 type definitions] for the interfaces of the same name.
+## Polyfills for Explicit Resource Management APIs
+
+This is a bare-bones implementation of the `DisposableStack` and
+`AsyncDisposableStack` APIS from the
+**[Explicit Resource Management Proposal]**. It is based on the
+**[TypeScript v5.2.2 type definitions]** for the interfaces of the same name.
 
 Intended to be used as a polyfill for users who want to use the
 `DisposableStack` and `AsyncDisposableStack` APIs in environments that don't
@@ -15,6 +18,9 @@ The `DisposableStack` class is a utility for managing resources that need to be
 cleaned up when they are no longer needed. It maintains a stack of disposable
 resources and provides methods to add and manage these resources. It also
 handles the graceful disposal of resources when the stack itself is disposed of.
+
+This class is an implementation of `Disposable` itself, meaning you can use it
+with the `using` statement in Deno v1.36.0+ for automatic resource cleanup.
 
 ### Usage
 
@@ -116,7 +122,11 @@ const stack2 = stack1.move();
 // stack2 now contains the resources, and stack1 is disposed of.
 ```
 
-#### `dispose(): void`
+#### `dispose`
+
+```ts
+dispose(): void;
+```
 
 This method disposes of all the resources in the stack in the reverse order they
 were added. If any error occurs during the disposal of an individual resource,
@@ -136,9 +146,13 @@ stack.dispose();
 
 The `AsyncDisposableStack` class is an extension of `DisposableStack`, designed
 for managing asynchronous resources. It offers a similar API but includes
-support for asynchronous disposal of resources. Just like `DisposableStack`, it
-maintains a stack of disposable resources, but the methods involved are
-asynchronous and return promises.
+support for asynchronous disposal of resources.
+
+Just like `DisposableStack`, it maintains a stack of disposable resources, but
+the methods involved are asynchronous and return promises.
+
+It also is an implementation of `AsyncDisposable` itself, meaning you can use it
+with the `await using` syntax in Deno v1.36.0+ for automatic resource cleanup.
 
 ### Usage
 
@@ -262,7 +276,11 @@ const stack2 = await stack1.move();
 // stack2 now contains the resources, and stack1 is disposed of.
 ```
 
-#### `async disposeAsync(): Promise<void>`
+#### `disposeAsync`
+
+```ts
+async disposeAsync(): Promise<void>;
+```
 
 This asynchronous method disposes of all the resources in the stack in the
 reverse order they were added. It returns a promise that resolves once all
@@ -287,17 +305,46 @@ await stack.disposeAsync();
 import type { Disposable } from "https://deno.land/x/dispose/mod.ts";
 ```
 
+The `Disposable` interface represents a resource that can be disposed of, with a
+**_synchronous_** cleanup operation defined by its `Symbol.dispose` method.
+
+This interface is already present in the TypeScript ESNext library, and also in
+Deno v1.36.0+, so you don't need to import it if you're using either of those
+environments. It is provided here for completeness, and for those who happen to
+be in an environment that doesn't support it yet.
+
+If you wish to use a resource with a `using` statement, it must have a cleanup
+operation defined by its `Symbol.dispose` method.
+
 ```ts
 interface Disposable {
   [Symbol.dispose](): void;
 }
 ```
 
+---
+
 ### `AsyncDisposable`
 
 ```ts
 import type { AsyncDisposable } from "https://deno.land/x/dispose/mod.ts";
 ```
+
+The `AsyncDisposable` interface represents a resource that can be disposed of
+asynchronously, Very similar to the `Disposable` interface, but with an
+**asynchronous** cleanup operation defined by its `Symbol.asyncDispose` method.
+
+If you wish to use a resource with an `await using` statement, it must have a
+cleanup operation named `Symbol.asyncDispose` (`Symbol.dispose` method, as a
+fallback).
+
+```ts
+interface AsyncDisposable {
+  [Symbol.asyncDispose](): PromiseLike<void> | void;
+}
+```
+
+===
 
 ### `Symbol.dispose` + `Symbol.asyncDispose`
 
