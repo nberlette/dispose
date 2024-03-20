@@ -1,0 +1,26 @@
+{
+  "name": "@nick/dispose",
+  "version": "1.0.2",
+  "description": "Polyfills for DisposableStack/AsyncDisposableStack and Symbol.dispose/Symbol.asyncDispose from the TC39 Proposal for Explicit Resource Management.",
+  "exports": {
+    ".": "./mod.ts",
+    "./disposable": "./disposable.ts",
+    "./disposable-stack": "./disposable-stack.ts",
+    "./async-disposable": "./async-disposable.ts",
+    "./async-disposable-stack": "./async-disposable-stack.ts",
+    "./symbol": "./symbol.ts"
+  },
+  "lock": false,
+  "publish": {
+    "include": [
+      "./deno.json",
+      "LICENSE",
+      "README.md",
+      "./*.ts"
+    ],
+    "exclude": [
+      "*.test.*",
+      "**/test/**"
+    ]
+  }
+}
