@@ -1,6 +1,6 @@
 {
   "name": "@nick/dispose",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Polyfills for DisposableStack/AsyncDisposableStack and Symbol.dispose/Symbol.asyncDispose from the TC39 Proposal for Explicit Resource Management.",
   "exports": {
     ".": "./mod.ts",
