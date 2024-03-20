@@ -1,5 +1,3 @@
-/// <reference lib="es2015.symbol" />
-
 export interface SymbolConstructor
   extends Omit<typeof globalThis.Symbol, "dispose" | "asyncDispose"> {
   /**
