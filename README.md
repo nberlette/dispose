@@ -24,6 +24,14 @@ with the `using` statement in Deno v1.36.0+ for automatic resource cleanup.
 
 ### Usage
 
+##### From [JSR](https://jsr.io) ([@nick/dispose](https://jsr.io/@nick/dispose))
+
+```ts
+import { DisposableStack } from "@nick/dispose";
+```
+
+##### From [deno.land/x](https://deno.land/x) ([dispose](https://deno.land/x/dispose))
+
 ```ts
 import { DisposableStack } from "https://deno.land/x/dispose/mod.ts";
 ```
@@ -155,6 +163,14 @@ It also is an implementation of `AsyncDisposable` itself, meaning you can use it
 with the `await using` syntax in Deno v1.36.0+ for automatic resource cleanup.
 
 ### Usage
+
+##### From [JSR](https://jsr.io) ([@nick/dispose](https://jsr.io/@nick/dispose))
+
+```ts
+import { AsyncDisposableStack } from "@nick/dispose";
+```
+
+##### From [deno.land/x](https://deno.land/x) ([dispose](https://deno.land/x/dispose))
 
 ```ts
 import { AsyncDisposableStack } from "https://deno.land/x/dispose/mod.ts";
@@ -301,6 +317,14 @@ await stack.disposeAsync();
 
 ### `Disposable`
 
+##### From [JSR](https://jsr.io) ([@nick/dispose](https://jsr.io/@nick/dispose))
+
+```ts
+import type { Disposable } from "@nick/dispose";
+```
+
+##### From [deno.land/x](https://deno.land/x) ([dispose](https://deno.land/x/dispose))
+
 ```ts
 import type { Disposable } from "https://deno.land/x/dispose/mod.ts";
 ```
@@ -325,6 +349,14 @@ interface Disposable {
 ---
 
 ### `AsyncDisposable`
+
+##### From [JSR](https://jsr.io) ([@nick/dispose](https://jsr.io/@nick/dispose))
+
+```ts
+import type { AsyncDisposable } from "@nick/dispose";
+```
+
+##### From [deno.land/x](https://deno.land/x) ([dispose](https://deno.land/x/dispose))
 
 ```ts
 import type { AsyncDisposable } from "https://deno.land/x/dispose/mod.ts";
@@ -352,9 +384,18 @@ If you happen to be in an environment that doesn't support the well-known
 symbols `Symbol.dispose` and `Symbol.asyncDispose` quite yet, you can import the
 `./symbol.ts` file to polyfill them on the global `Symbol` object.
 
+##### From [JSR](https://jsr.io) ([@nick/dispose](https://jsr.io/@nick/dispose))
+
+```ts
+import "@nick/dispose/symbol";
+```
+
+##### From [deno.land/x](https://deno.land/x) ([dispose](https://deno.land/x/dispose))
+
 ```ts
 import "https://deno.land/x/dispose/symbol.ts";
 ```
+
 
 > **Warning**: this particular file is a global polyfill: it mutates the
 > **global** `Symbol` object, and augments the global `SymbolConstructor`
@@ -378,10 +419,12 @@ Here's an example of the `AsyncDisposableStack` API and how it can be used. You
 can drop this in the Deno CLI (v1.36.0+) and it will "just work".
 
 ```ts
-import {
-  type AsyncDisposable,
-  AsyncDisposableStack,
-} from "https://deno.land/x/dispose/mod.ts";
+import { type AsyncDisposable, AsyncDisposableStack } from "@nick/dispose";
+// Or from "https://deno.land/x/dispose/mod.ts"
+//import {
+//  type AsyncDisposable,
+//  AsyncDisposableStack,
+//} from "https://deno.land/x/dispose/mod.ts";
 
 class AsyncConstruct implements AsyncDisposable {
   #resourceA: AsyncDisposable;
@@ -459,10 +502,12 @@ for managing synchronous resources. This is more pseudo-code than anything else;
 it was taken directly from the [TypeScript v5.2.2 type definitions].
 
 ```ts
-import {
-  type Disposable,
-  DisposableStack,
-} from "https://deno.land/x/dispose/mod.ts";
+import { type Disposable, DisposableStack } from "@nick/dispose";
+// Or from "https://deno.land/x/dispose/mod.ts"
+//import {
+//  type Disposable,
+//  DisposableStack,
+//} from "https://deno.land/x/dispose/mod.ts";
 
 class Construct implements Disposable {
   #resourceA: Disposable;
